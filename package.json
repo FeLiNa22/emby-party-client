@@ -1,12 +1,13 @@
 {
-  "name": "emby-client",
+  "name": "emby-party-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "react": "^17.0.1",
     "react-app-rewired": "^2.1.8",
     "react-dom": "^17.0.1",
-    "react-scripts": "4.0.1"
+    "react-scripts": "4.0.1",
+    "socket.io-client": "^3.0.4"
   },
   "scripts": {
     "start": "react-scripts start",

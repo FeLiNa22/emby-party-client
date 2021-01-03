@@ -1,25 +1,22 @@
-import React from 'react'
-import './App.css'
+import React, {Component} from 'react';
+import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>Popup page</p>
-        <p>
-          Edit <code>src/views/Popup/App.js</code> and save.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import PartyConnect from './createParty.js';
+
+
+class App extends Component {
+  render(){
+    return (
+      <div className="App">
+       
+
+        <PartyConnect />
+
+        
+      </div>
+    );
+  }
 }
+
 
 export default App

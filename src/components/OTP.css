@@ -1,0 +1,14 @@
+.Otp-container{
+    width: 100%;
+}
+
+.Otp-input{
+    margin: 1vmin;
+    border : solid 2px rgb(77, 71, 71);
+    border-radius: 5px;
+    width: 11vw;
+    height: 11vw;
+    font-size : calc(6vmin + .2em);
+    text-align : center;
+    font-weight : 800;
+}
