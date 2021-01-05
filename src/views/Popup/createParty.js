@@ -1,10 +1,9 @@
 import React, { Component } from "react";
 import "./App.css";
 import { io } from "socket.io-client";
+import OTPInput from '../../components/OTP/OTPInput'
 
-import logo from "../../assets/emby.png";
-
-import OTPInput from '../../components/OTPInput'
+import logo from './../../assets/images/emby.png'
 
 const socket_url = "ws://localhost:4000";
 
