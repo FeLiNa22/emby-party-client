@@ -2,28 +2,32 @@ import { Component } from "react";
 import "./OTP.css";
 
 class OTPInput extends Component {
+  static defaultProps = {
+    activeInput : 0,
+    numInputs : 0,
+    onChange : (OTP) => {
+      console.log("onChange " + OTP);
+    },
+    onSubmit : (OTP) => {
+      console.log("onSubmit " + OTP);
+    }
+  }
+
   constructor(props) {
     super(props);
 
-    const { numInputs, onChange } = props;
-
-    this.onChange = onChange;
-
-    this.numInputs = numInputs;
-    if (this.numInputs <= 0) {
-      throw new Error("number of input boxes must be greater than 0");
-    }
     // refs to all input boxes
-    this.inputRefs = new Array(this.numInputs);
-    this.index = 0;
+    this.inputRefs = new Array(this.props.numInputs);
+    // holds index of focused Input box
+    this.activeInput = this.props.activeInput;
 
     this.state = {
-      OTPvalues: new Array(this.numInputs).fill(""),
+      OTPvalues: new Array(this.props.numInputs).fill(""),
     };
   }
 
   componentDidMount(){
-    this.inputRefs[this.index].focus();
+    this.inputRefs[this.activeInput].focus();
   }
 
   handleKeyDown = (event) => {
@@ -38,10 +42,14 @@ class OTPInput extends Component {
         break;
       case "Backspace":
         event.preventDefault();
-        if (this.getOtpValue(this.index) !== "") {
-          this.setOtpValue(this.index, "");
+        if (this.getOtpValue(this.activeInput) !== "") {
+          this.setOtpValue(this.activeInput, "");
         }
         this.focusPrev();
+        break;
+      case "Enter":
+        event.preventDefault();
+        this.triggerOnSubmitHandler();
         break;
       default:
         break;
@@ -49,7 +57,15 @@ class OTPInput extends Component {
   };
 
   getOTP = () => {
-    return this.props.onChange(this.state.OTPvalues.join(""));
+    return this.state.OTPvalues.join("");
+  }
+
+  triggerOnSubmitHandler = () => {
+    this.props.onSubmit(this.getOTP());
+  }
+
+  triggerOnChangeHandler = () => {
+    return this.props.onChange(this.getOTP());
   };
 
   getOtpValue = (idx) => {
@@ -63,18 +79,18 @@ class OTPInput extends Component {
       return { OTPvalues: newValues };
     });
     // run callback function whenever edit is made to the OTPvalues
-    this.getOTP();
+    this.triggerOnChangeHandler();
   };
 
   focusPrev = () => {
-    // set index to prev box
-    this.index = Math.max(this.index - 1, 0);
-    this.inputRefs[this.index].focus();
+    // set activeInput to prev box
+    this.activeInput = Math.max(this.activeInput - 1, 0);
+    this.inputRefs[this.activeInput].focus();
   };
 
   focusNext = () => {
-    this.index = Math.max(Math.min(this.index + 1, this.numInputs - 1));
-    this.inputRefs[this.index].focus();
+    this.activeInput = Math.max(Math.min(this.activeInput + 1, this.props.numInputs - 1));
+    this.inputRefs[this.activeInput].focus();
   };
 
   render() {
@@ -89,7 +105,7 @@ class OTPInput extends Component {
                 this.inputRefs[idx] = ref;
               }}
               onFocus={(e) => {
-                this.index = idx;
+                this.activeInput = idx;
                 e.target.select();
               }}
               onInput={(e) => {
@@ -98,9 +114,9 @@ class OTPInput extends Component {
               }}
               onPaste={(e) => {
                 var pasteData = e.clipboardData.getData('Text');
-                for (let i = 0; i < Math.min(this.numInputs, pasteData.length); i++) {
+                for (let i = 0; i < Math.min(this.props.numInputs, pasteData.length); i++) {
                   this.setOtpValue(i, pasteData[i]);
-                  this.index = i;
+                  this.activeInput = i;
                 }
               }}
               className="Otp-input"

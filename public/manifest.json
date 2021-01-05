@@ -17,8 +17,9 @@
 
   "content_scripts": [
     {
-      "js": ["static/js/content.js"],
-      "matches": ["http://*.example.com/*", "https://*.example.com/*"]
+      "matches": [ "<all_urls>" ],
+      "css": ["static/css/content.css"],
+      "js": ["static/js/content.js"]
     }
   ],
 
@@ -36,5 +37,7 @@
     "page": "options.html"
   },
 
-  "permissions": ["storage"]
+  "permissions": ["storage",
+    "activeTab"
+  ]
 }

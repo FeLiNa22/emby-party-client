@@ -1,19 +1,11 @@
 console.log('Hello Background');
 
-/**
- * When extension runs on a page with the <video> tag
- */
-chrome.runtime.onInstalled.addListener(function() {
-    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [
-          // When a page contains a <video> tag...
-          new chrome.declarativeContent.PageStateMatcher({
-            css: ["video"]
-          })
-        ],
-        // ... show the page action.
-        actions: [new chrome.declarativeContent.ShowPageAction() ]
-      }]);
-    });
-  });
+// Called when the user clicks on the browser action
+chrome.browserAction.onClicked.addListener(function(tab) {
+   // Send a message to the active tab
+   chrome.tabs.query({active: true, currentWindow:true},function(tabs) {
+        var activeTab = tabs[0];
+        chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
+        console.log("toggle message sent");
+   });
+});

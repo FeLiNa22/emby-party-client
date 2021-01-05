@@ -1,55 +1,31 @@
 /*global chrome*/
 
 import { Component } from "react";
-import ChatApp from "./components/Chat/ChatApp";
+import ReactDOM from 'react-dom';
 
-import IFrame from './components/IFrame/IFrame.js'
+import Frame, { FrameContextConsumer }from 'react-frame-component';
+import App from './views/Sidebar/App';
 
-/*
-msg = {
-    user : string;
-    text : string;
-    timestamp : time;
-}
-*/
-
-class Sidebar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { isVisible: true };
-  }
-
-  onSendMessage = (text) => {
-    // sends a message through the chat (through backend)
-    console.log("message sent " + text);
-  };
-
-  toggleCollapse = () => {
-    this.setState((prevState) => ({ isVisible: !prevState.isVisible }));
-  };
-
+class Main extends Component {
   render() {
-    return (
-      <div>
-      <link
-          data-frame
-          type="text/css"
-          rel="stylesheet"
-          href="./assets/css/Sidebar.css"
-        /> 
-        <IFrame title={"emby-sidebar"} frameBorder="0" >
-       <button className="Sidebar-toggle" onClick={this.toggleCollapse}>
-          {this.state.isVisible ? "Hide" : "Show"}
-        </button>
-        <div className="Sidebar" >
-          <ChatApp onSendMessage={this.onSendMessage} />
-          {/* <Avatar /> */}
-          {/* <Playback /> */}
-        </div>
-      </IFrame>
-      </div>
-    );
+      return (
+          <Frame head={[<link type="text/css" rel="stylesheet" href={chrome.runtime.getURL("/static/css/content.css")} ></link>]}> 
+             <FrameContextConsumer>
+             {
+                ({document, window}) => {
+                  return <App document={document} window={window}/> 
+                }
+              }
+              </FrameContextConsumer>
+          </Frame>
+      )
   }
 }
 
-export default Sidebar;
+const app = document.createElement('div');
+app.id = "emby-party-wrapper";
+document.body.appendChild(app);
+
+ReactDOM.render(<Main />, app);
+
+
