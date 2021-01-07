@@ -57,8 +57,6 @@ class SendMessageForm extends Component {
     this.inputRef.value += emoji.native;
   }
 
-
-
   render() {
     return (
       <div className="Chat-sendForm">

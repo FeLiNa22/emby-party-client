@@ -72,12 +72,11 @@ class Injectable extends Component {
               visibility: this.state.isVisible ? "visible" :  "hidden",
               position: "absolute",
               top: 0,
-              right: 0,
+              left: 0,
               padding: "20px",
-              backgroundColor: "white",
             }}
             onClick={this.toggleVisibility}
-          ></button>
+          ><i class="fa fa-close"></i></button>
         </div>
       </>
     );

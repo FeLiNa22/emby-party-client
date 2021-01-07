@@ -35,26 +35,13 @@ class App extends Component {
   }
 
   componentDidMount() {
-    // handle user messaging in chat
-    this.socket.on("user message party", (socketId, msg) => {
-      console.log("user" + socketId + "had sent a message " + msg);
-      this.setState((prevState) => ({ messages: prevState.messages }));
-    });
-
-    // handle user leaving the party
-    this.socket.on("user left party", (socketId) => {
-      var msg = "User has left the party " + socketId;
-      console.log(msg);
-      this.addMessage(msg);
-    });
-
-    // handle user joining the party
-    this.socket.on("user joined party", (socketId, partyId) => {
+    // handle passing user to content script
+    this.socket.on("user party exists", (partyId, status) => {
       var msg = "User has joined the party " + socketId;
       console.log(msg);
 
       // if we are the user who joined
-      if (socketId === this.socket.id) {
+      if (status === true) {
         this.setState({ view: this.confirmationView });
       }
 
@@ -108,8 +95,8 @@ class App extends Component {
   };
 
   joinParty = (partyId) => {
-    console.log("joining party");
-    this.socket.emit("join party", partyId);
+    console.log("testing party exists");
+    this.socket.emit("party exists", partyId);
   };
 
   addMessage(msg) {

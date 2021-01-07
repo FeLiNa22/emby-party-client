@@ -1,11 +1,33 @@
-console.log('Hello Background');
+import { io } from "socket.io-client";
+console.log("Hello Background");
 
-// Called when the user clicks on the browser action
-chrome.browserAction.onClicked.addListener(function(tab) {
-   // Send a message to the active tab
-   chrome.tabs.query({active: true, currentWindow:true},function(tabs) {
-        var activeTab = tabs[0];
-        chrome.tabs.sendMessage(activeTab.id, {"message": "clicked_browser_action"});
-        console.log("toggle message sent");
-   });
+const socket_url = "ws://localhost:4000";
+
+const socket_options = {
+  reconnectionDelayMax: 10000,
+  query: {
+    auth: "123",
+  },
+  withCredentials: false,
+};
+
+const socket = io(socket_url, socket_options);
+
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+   switch (message) {
+     case "create":
+       socket.emit("create party");
+       break;
+     case "join":
+   }
+ });
+
+chrome.runtime.onMessage.addListener(function (message, sender, resposendResponsense) {
+  switch (message) {
+    case "create":
+      // create party
+      socket.emit("create party");
+      break;
+    case "join":
+  }
 });

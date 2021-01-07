@@ -40,7 +40,7 @@ class EmojiPicker extends Component {
       <div ref={(ref)=>{this.pickerRef = ref}} style={{display:'inline-block', position:'relative'}}>
          {this.state.isOpened && (
           <Picker
-            style={{ display:"block", position:'absolute',  top: "-350px", left: "50px" }}
+            style={{ display:"block", position:'absolute',  top: "-350px", left: "15px" }}
             showPreview={false}
             showSkinTones={false}
             emojiTooltip={true}

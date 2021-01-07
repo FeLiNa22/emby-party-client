@@ -3,14 +3,10 @@ import { Component } from "react";
 // chat app
 import ChatApp from "../../components/Chat/ChatApp";
 
-
 import "./App.css";
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { messages: [] };
-  }
+
 
   onRecieveMessage = (text) => {
     // recieve a message through the chat (through backend)
@@ -26,8 +22,10 @@ class App extends Component {
     return (
       <div className="Sidebar">
         <ChatApp
-          messages={this.state.messages}
-          onSendMessage={this.onSendMessage}
+          title={"Chat"}
+          messages={this.props.messages}
+          onSendMessage={null}
+          onRecieveMessage={null}
         />
         {/* <Avatar /> */}
         {/* <Playback /> */}
