@@ -83,14 +83,18 @@ class Injectable extends Component {
   }
 }
 
-let injectSidebar = () => {
-  const injection = document.createElement("div");
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
+async function injectSidebar() {
+  const injection = document.createElement("div");
   // injects the sidebar into the page
   document.body.appendChild(injection);
-
   // render component
   ReactDOM.render(<Injectable />, injection);
+  // give the iframe time to render
+  await sleep(2000);
 };
 
 injectSidebar();

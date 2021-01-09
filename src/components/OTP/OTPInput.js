@@ -1,17 +1,19 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import "./OTP.css";
 
 class OTPInput extends Component {
   static defaultProps = {
-    activeInput : 0,
-    numInputs : 0,
-    onChange : (OTP) => {
+    submitButton : null,
+    focus: true,
+    activeInput: 0,
+    numInputs: 0,
+    onChange: (OTP) => {
       console.log("onChange " + OTP);
     },
-    onSubmit : (OTP) => {
+    onSubmit: (OTP) => {
       console.log("onSubmit " + OTP);
-    }
-  }
+    },
+  };
 
   constructor(props) {
     super(props);
@@ -26,8 +28,10 @@ class OTPInput extends Component {
     };
   }
 
-  componentDidMount(){
-    this.inputRefs[this.activeInput].focus();
+  componentDidMount() {
+    if (this.props.focus) {
+      this.inputRefs[this.activeInput].focus();
+    }
   }
 
   handleKeyDown = (event) => {
@@ -58,11 +62,11 @@ class OTPInput extends Component {
 
   getOTP = () => {
     return this.state.OTPvalues.join("");
-  }
+  };
 
   triggerOnSubmitHandler = () => {
     this.props.onSubmit(this.getOTP());
-  }
+  };
 
   triggerOnChangeHandler = () => {
     return this.props.onChange(this.getOTP());
@@ -70,7 +74,7 @@ class OTPInput extends Component {
 
   getOtpValue = (idx) => {
     return this.state.OTPvalues[idx];
-  }
+  };
 
   setOtpValue = (idx, val) => {
     this.setState((prevState) => {
@@ -89,12 +93,15 @@ class OTPInput extends Component {
   };
 
   focusNext = () => {
-    this.activeInput = Math.max(Math.min(this.activeInput + 1, this.props.numInputs - 1));
+    this.activeInput = Math.max(
+      Math.min(this.activeInput + 1, this.props.numInputs - 1)
+    );
     this.inputRefs[this.activeInput].focus();
   };
 
   render() {
     return (
+      <>
       <div className="Otp-container">
         {this.state.OTPvalues.map((val, idx) => {
           return (
@@ -113,8 +120,12 @@ class OTPInput extends Component {
                 this.focusNext();
               }}
               onPaste={(e) => {
-                var pasteData = e.clipboardData.getData('Text');
-                for (let i = 0; i < Math.min(this.props.numInputs, pasteData.length); i++) {
+                var pasteData = e.clipboardData.getData("Text");
+                for (
+                  let i = 0;
+                  i < Math.min(this.props.numInputs, pasteData.length);
+                  i++
+                ) {
                   this.setOtpValue(i, pasteData[i]);
                   this.activeInput = i;
                 }
@@ -126,6 +137,8 @@ class OTPInput extends Component {
           );
         })}
       </div>
+      {React.isValidElement(this.props.submitButton) && React.cloneElement(this.props.submitButton, {onClick : this.triggerOnSubmitHandler})}
+      </>
     );
   }
 }

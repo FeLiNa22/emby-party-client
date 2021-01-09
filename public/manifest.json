@@ -15,13 +15,6 @@
     "scripts": ["static/js/background.js"]
   },
 
-  "content_scripts": [
-    {
-      "matches": [ "<all_urls>" ],
-      "js": ["static/js/content.js"]
-    }
-  ],
-
   "browser_action": {
     "default_icon": {
       "16": "logo16.png",
@@ -36,9 +29,9 @@
     "page": "options.html"
   },
 
-  "web_accessible_resources": ["static/js/sidebar.js", "sidebar.html"],
+  "web_accessible_resources": [ "static/js/sidebar.js", "sidebar.html"],
 
-  "permissions": ["storage",
+  "permissions": ["storage","tabs",
     "activeTab"
   ]
 }
