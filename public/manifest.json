@@ -29,7 +29,7 @@
     "page": "options.html"
   },
 
-  "web_accessible_resources": [ "static/js/sidebar.js", "sidebar.html"],
+  "web_accessible_resources": [ "/static/js/content.js", "/static/css/content.css"],
 
   "permissions": ["storage","tabs",
     "activeTab"

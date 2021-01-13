@@ -17,8 +17,7 @@ function override(config, env) {
     popup: paths.appIndexJs,
     options: paths.appSrc + '/options.js',
     background: paths.appSrc + '/background.js',
-    content: paths.appSrc + '/content.js',
-    sidebar: paths.appSrc + '/sidebar.js'
+    content: paths.appSrc + '/content.js'
   };
   // Change output filename template to get rid of hash there
   config.output.filename = 'static/js/[name].js';
@@ -68,18 +67,6 @@ function override(config, env) {
   // Add the above HtmlWebpackPlugin instance into config.plugins
   // Note: you may remove/comment the next line if you don't need an options page
   config.plugins.push(optionsHtmlPlugin);
-
-  // Extra HtmlWebpackPlugin instance for options page
-  const sidebarHtmlPlugin = new HtmlWebpackPlugin({
-    inject: true,
-    chunks: ['sidebar'],
-    template: paths.appPublic + '/sidebar.html',
-    filename: 'sidebar.html',
-    minify: isEnvProduction && minifyOpts,
-  });
-  // Add the above HtmlWebpackPlugin instance into config.plugins
-  // Note: you may remove/comment the next line if you don't need an options page
-  config.plugins.push(sidebarHtmlPlugin);
 
   // Custom ManifestPlugin instance to cast asset-manifest.json back to old plain format
   const manifestPlugin = new ManifestPlugin({
