@@ -6,6 +6,7 @@ import "./App.css";
 
 /* Inject Sidebar and Sidebar toggler */
 class App extends Component {
+
   static defaultProps = {
     style: {
       position: "fixed",
@@ -60,7 +61,7 @@ class App extends Component {
             right: this.state.isVisible ? 0 : '-' + this.props.style.width ,
           }}
         >
-          <Sidebar/>
+          <Sidebar />
           <button
             style={{
               visibility: this.state.isVisible ? "visible" :  "hidden",
@@ -76,7 +77,6 @@ class App extends Component {
     );
   }
 }
-
 
 
 export default App;

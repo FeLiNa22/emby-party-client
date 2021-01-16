@@ -1,33 +1,33 @@
-import { io } from "socket.io-client";
 console.log("Hello Background");
+// injection script
+const script = { file: "/static/js/content.js" };
 
-const socket_url = "ws://localhost:4000";
-
-const socket_options = {
-  reconnectionDelayMax: 10000,
-  query: {
-    auth: "123",
-  },
-  withCredentials: false,
+const handleBackgroundMessage = (message, sender, sendResponse) => {
+  console.log(message);
+  switch (message.background) {
+    case "join-party":
+      chrome.tabs.create({ url: message.data.url }, function (tab) {
+        // injects script into new tab
+        chrome.tabs.executeScript(tab.id, script, function () {
+          // sends join message to new tab
+          chrome.tabs.sendMessage(tab.id, {
+            content: "join-party",
+            data: message.data,
+          });
+        });
+      });
+      break;
+    default:
+      break;
+  }
 };
 
-const socket = io(socket_url, socket_options);
-
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-   switch (message) {
-     case "create":
-       socket.emit("create party");
-       break;
-     case "join":
-   }
- });
-
-chrome.runtime.onMessage.addListener(function (message, sender, resposendResponsense) {
-  switch (message) {
-    case "create":
-      // create party
-      socket.emit("create party");
-      break;
-    case "join":
+chrome.runtime.onMessage.addListener(function (
+  message,
+  sender,
+  sendResponse
+) {
+  if (message && message.background) {
+    handleBackgroundMessage(message, sender, sendResponse);
   }
 });

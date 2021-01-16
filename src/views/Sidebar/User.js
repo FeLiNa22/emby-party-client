@@ -39,12 +39,12 @@ class User{
     this.props.username = username;    
   }
 
-  createParty = (url) => {
-    this.socket.emit("party:create", {url});
+  createParty = (url, onResponse) => {
+    this.socket.emit("party:create", {url}, onResponse);
   }
 
-  joinParty = (partyId) => {
-    this.socket.emit("party:join", {partyId})
+  joinParty = (partyId, onResponse) => {
+    this.socket.emit("party:join", {partyId}, onResponse);
   }
 
   messageParty = (message) => {
@@ -62,11 +62,6 @@ class User{
     // when socket is disconnected
     this.socket.on('disconnect', () => {
       this.props.onDisconnect();
-    });
-
-    // when party is created by a user
-    this.socket.on('response:created', (resp) => {
-      this.props.onPartyCreated(resp);
     });
 
     // when user joins a party

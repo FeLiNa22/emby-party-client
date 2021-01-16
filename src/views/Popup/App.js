@@ -44,7 +44,7 @@ class App extends Component {
 
   handleError = (resp) => {
     try {
-      this.setHeader(resp.error.message)
+      this.setHeader(resp.error.message);
     } catch {
       this.setHeader(this.props.defaultErrorMessage);
       this.setView();
@@ -53,6 +53,35 @@ class App extends Component {
 
 
   componentDidMount() {
+    const handlePopupMessages = (message, sender, sendResponse) => {
+      console.log(message);
+      switch (message.popup) {
+        case "joined-party":
+          if (!this.hasResponse(message) || this.hasError(message)) {
+            this.handleError(message);
+          } else {
+            if (message.data.partyId) {
+              this.setState({partyId : message.data.partyId});
+              this.setHeader("Share the code with your friends");
+              this.setView(this.createdView);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    
+    chrome.runtime.onMessage.addListener(function (
+      message,
+      sender,
+      sendResponse
+    ) {
+      if (message && message.popup) {
+        handlePopupMessages(message, sender, sendResponse);
+      }
+    });
+
     // check if the page already is connected to an emby party session show code for party
     const handleResponse = (resp) => {
       if (this.hasResponse(resp)) {
@@ -74,23 +103,17 @@ class App extends Component {
   }
 
   createParty = () => {
-    const  handleResponse =  (resp) => {
-      if (!this.hasResponse(resp) || this.hasError(resp)) {
-        this.handleError(resp);
-      } else {
-        if (resp.data.partyId) {
-          this.setState({partyId : resp.data.partyId});
-          this.setHeader("Share the code with your friends");
-          this.setView(this.createdView);
-        }
-      }
-    };
-
     // inject script into current tab
+    const self = this;
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const activeTab = tabs[0];
-      chrome.tabs.executeScript(activeTab.id, script, function () {
-        chrome.tabs.sendMessage(activeTab.id, { content: "create-party", data : {url : activeTab.url} }, null, handleResponse);
+      chrome.tabs.executeScript(activeTab.id, script, function (resp) {
+        if (self.hasResponse(resp)){
+          chrome.tabs.sendMessage(activeTab.id, { content: "create-party", data : {url : activeTab.url} });
+        } else {
+          self.setHeader("You cannot create a party for this page");
+          self.setView();
+        }
       });
     });
   };
@@ -114,17 +137,14 @@ class App extends Component {
     fetch(apiServer + endpoint)
       .then((resp) => resp.json())
       .then((resp) => {
-        console.log(resp);
         if (this.hasError(resp)) {
           this.handleError(resp);
         } else {
-          chrome.tabs.create({ url: resp.data.url }, function (tab) {
-            // injects script into new tab
-            chrome.tabs.executeScript(tab.id, script, function () {
-              // sends join message to 
-              chrome.tabs.sendMessage(tab.id, { content: "join-party", data : {partyId} }, handleResponse);
-            });
-          });
+          // dereference the data object to ensure their is no potentially bad data
+          var {url, partyId} = resp.data;
+          // sends a message to background script
+          // this will in turn open a new tab and execute the script in it
+          chrome.runtime.sendMessage(null,{background : "join-party", data : {url, partyId} })
         }
       })
       .catch((err) => {
