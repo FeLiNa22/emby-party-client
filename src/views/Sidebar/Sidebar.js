@@ -12,12 +12,10 @@ const SERVER_MESSAGES = {
 }
 
 class Sidebar extends Component {
-  partyId = null;
-  partyUrl = null;
 
   state = {
     messages: [],
-    isConnected : false,
+    view : null,
   };
 
   constructor(props) {
@@ -25,10 +23,10 @@ class Sidebar extends Component {
 
     const user_props = {
       username: "",
-      onConnect: () => this.setState({isConnected : true}),
-      onDisconnect: () => this.setState({isConnected : false}),
-      onPartyCreated: ({ partyId }) => {this.partyId = partyId},
-      onPartyJoined: ({ partyId }) => console.log(partyId),
+      onConnect: () => this.setState({view : null}),
+      onDisconnect: () => this.setState({view : null}),
+      onPartyCreated: ({ partyId }) => {chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}})},
+      onPartyJoined: ({ partyId }) => {chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}})},
       onPartyUserJoining: ({ user, partyId }) =>
         console.log("user " + user + " joined the party " + partyId),
       onPartyUserLeft: ({ user, partyId }) =>
@@ -43,37 +41,18 @@ class Sidebar extends Component {
     const handlePopupMessages = (message, sender, sendResponse) => {
       switch (message.content) {
         case "create-party":
-          var onResponse = ({partyId}) => {
-            console.log(partyId);
-            this.partyId = partyId;
-            this.partyUrl = message.data.url;
-            // send response message back to popup
-            chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}});
-          }
-
-
           // try and create the party room
-          this.user.createParty(message.data.url, onResponse);
+          this.user.createParty(message.data.url);
           break;
 
         case "join-party":
-          console.log("trying to join party "+ message.data.partyId);
-
-          var onResponse = ({partyId, url}) => {
-            console.log(partyId);
-            this.partyId = partyId;
-            this.partyUrl = url;
-            // send response message back to popup
-            chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}});
-          }
-
-          this.user.joinParty(message.data.partyId, onResponse);
+          this.user.joinParty(message.data.partyId);
           break;
 
         case "already-connected":
-          console.log("checking already connected"+ this.partyId);
-          if(this.state.isConnected && this.partyId){
-            sendResponse({data : {partyId : this.partyId}});
+          console.log("checking already connected"+ this.user.partyId);
+          if(this.user.isConnected && this.user.partyId){
+            sendResponse({data : {partyId : this.user.partyId}});
           }
           break;
         default:
