@@ -1,9 +1,8 @@
-import { Component } from 'react';
-import './ChatApp.css'
+import { Component } from "react";
+import "./ChatApp.css";
 
-import EmojiPicker  from './EmojiPicker';
-import { SendIcon } from './Icons';
-
+import EmojiPicker from "./EmojiPicker";
+import { SendIcon } from "./Icons";
 
 class Title extends Component {
   static defaultProps = {
@@ -21,19 +20,18 @@ class Title extends Component {
 
 class SendMessageForm extends Component {
   static defaultProps = {
-    placeholder : "send message...",
+    placeholder: "send message...",
     onSendMessage: (text) => {
       console.log(text);
     },
   };
 
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state= {
-      isEmojiPickerMounted : false
-    }
+    this.state = {
+      isEmojiPickerMounted: false,
+    };
   }
-
 
   handleSendButton = (e) => {
     e.preventDefault();
@@ -44,24 +42,21 @@ class SendMessageForm extends Component {
     switch (e.key) {
       // if enter is pressed send the message
       case "Enter":
-        e.preventDefault();
-        this.sendMessage();
+        this.handleSendButton(e);
         break;
       default:
         break;
     }
   };
 
- 
   onSelectEmoji = (emoji) => {
     this.inputRef.value += emoji.native;
-  }
+  };
 
   render() {
     return (
       <div className="Chat-sendForm">
-       
-       <EmojiPicker onSelectEmoji={this.onSelectEmoji}/>
+        <EmojiPicker onSelectEmoji={this.onSelectEmoji} />
         <input
           placeholder={this.props.placeholder}
           type="text"
@@ -73,7 +68,7 @@ class SendMessageForm extends Component {
           onKeyDown={this.handleKeyDown}
         ></input>
         <button className="Chat-button" onClick={this.handleSendButton}>
-          <SendIcon style={{color : "#63ce50"}}/>
+          <SendIcon style={{ color: "#63ce50" }} />
         </button>
       </div>
     );
@@ -83,7 +78,7 @@ class SendMessageForm extends Component {
 class Messages extends Component {
   static defaultProps = {
     messages: [],
-    renderMessage: (text) => {
+    renderChatMessage: (text) => {
       return (
         <div className="Chat-message">
           <p>{text}</p>
@@ -94,15 +89,19 @@ class Messages extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { messages: props.messages };
+    this.state = { messages: this.props.messages };
   }
+
+  addMessage = (msg) => {
+    this.setState((prevState) => ({
+      messages: prevState.messages.concat(msg),
+    }));
+  };
 
   render() {
     return (
       <div className="Chat-container">
-        {this.state.messages.map((msg) => 
-          this.props.renderMessage(msg)
-        )}
+        {this.state.messages.map((msg) => this.props.renderChatMessage(msg))}
       </div>
     );
   }
@@ -111,13 +110,18 @@ class Messages extends Component {
 /* The chat app requires only the onSendMessage function */
 
 class ChatApp extends Component {
+  // relay msg to Messages component
+  addMessage = (msg) => {
+    this.messageRef.addMessage(msg);
+  };
+
   render() {
     return (
       <div className="Chat-app">
         <Title title={this.props.title} />
         <Messages
-          messages={this.props.messages}
-          renderMessage={this.props.renderMessage}
+          ref={(ref) => (this.messageRef = ref)}
+          renderChatMessage={this.props.renderChatMessage}
         />
         <SendMessageForm onSendMessage={this.props.onSendMessage} />
       </div>

@@ -1,10 +1,8 @@
 .Sidebar{
-    position: relative;
-    top: 0px;
-    right: 0px;
     height: 100%;
     width: 100%;
-    text-align: center;
+    background-color: rgb(19, 19, 19);
     overflow: hidden;
+    box-shadow: -10px 0px 18px #888888;
 }
 

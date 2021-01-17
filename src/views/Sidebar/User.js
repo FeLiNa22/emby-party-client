@@ -13,19 +13,18 @@ const socket_options = {
 class User {
   partyId = null;
   partyUrl = null;
-  isConnected = false;
+  name = "";
 
   static defaultProps = {
-    username: "",
     onConnect: () => console.log("connected to server"),
     onDisconnect: () => console.log("disconnected from server"),
-    onPartyCreated: ({ partyId }) => console.log(partyId),
-    onPartyJoined: ({ partyId }) => console.log(partyId),
-    onPartyUserJoining: ({ user, partyId }) =>
+    onPartyCreated: (resp) => console.log(resp),
+    onPartyJoined: (resp) => console.log(resp),
+    onUserJoined: ({ user, partyId }) =>
       console.log("user " + user + " joined the party " + partyId),
-    onPartyUserLeft: ({ user, partyId }) =>
+    onUserLeft: ({ user, partyId }) =>
       console.log("user " + user + " left the party " + partyId),
-    onRecieveMessage: ({ msg }) => console.log(msg),
+    onUserMessage: ({ user, message }) => console.log("user " + user + " sent message : " + message),
   };
 
   constructor(props) {
@@ -36,60 +35,77 @@ class User {
     this.setupEventListeners();
   }
 
-  setUsername = (username) => {
-    this.props.username = username;
+  // packs the non-sensitive user details into an object before sending to server
+  userDetails = () => ({name : this.name, sid : this.socket.id});
+
+  reset = () => {
+    this.partyId = null;
+    this.partyUrl = null;
+  }
+
+  setUsername = (name) => {
+    this.name = name;
   };
 
   createParty = (url) => {
-    const onResponse = ({ partyId }) => {
-      this.partyId = partyId;
-      this.partyUrl = url;
-      this.props.onPartyCreated({ partyId });
-    };
-    this.socket.emit("party:create", { url }, onResponse);
+    const onCallback = (resp) => {
+      if(resp.data){
+        var {partyId, url} = resp.data;
+        this.partyId = partyId;
+        this.partyUrl = url;
+        this.props.onPartyCreated(resp.data);
+      }else if (resp.error){
+        this.props.onError(resp.error);
+      }
   };
+  this.socket.emit("party:create", { url }, onCallback);
+};
 
   joinParty = (partyId) => {
-    const onResponse = ({ partyId, url }) => {
-      this.partyId = partyId;
-      this.partyUrl = url;
-      this.props.onPartyJoined({ partyId, url });
+    const onCallback = (resp) => {
+      if(resp.data){
+        var {partyId, url} = resp.data;
+        this.partyId = partyId;
+        this.partyUrl = url;
+        this.props.onPartyJoined(resp.data);
+      }else if (resp.error){
+        this.props.onError(resp.error);
+      }
     };
-    this.socket.emit("party:join", { partyId }, onResponse);
+    this.socket.emit("party:join", { user : this.userDetails(), partyId}, onCallback);
   };
 
   messageParty = (message) => {
-    if (this.isConnected && this.partyId) {
-      this.socket.emit("party:message", { partyId: this.partyId, message });
+    if (this.partyId && message) {
+      this.socket.emit("party:message", { user : this.userDetails(), partyId: this.partyId, message });
     }
   };
 
   setupEventListeners = () => {
     // check socket connected to server
     this.socket.on("connect", () => {
-      this.isConnected = true;
       this.props.onConnect();
     });
 
     // when socket is disconnected
     this.socket.on("disconnect", () => {
-      this.isConnected = false;
+      this.reset();
       this.props.onDisconnect();
     });
 
     // when user joins a party
     this.socket.on("response:user-joined", (resp) => {
-      this.props.onPartyJoined(resp);
+      this.props.onUserJoined(resp);
     });
 
     // when a different user leaves the party
     this.socket.on("response:user-left", (resp) => {
-      this.props.onPartyUserLeft(resp);
+      this.props.onUserLeft(resp);
     });
 
     // when any user (including yourself) sends a message in the party
     this.socket.on("response:user-message", (resp) => {
-      this.props.onRecieveMessage(resp);
+      this.props.onUserMessage(resp);
     });
   };
 }

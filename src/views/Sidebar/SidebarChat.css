@@ -1,0 +1,38 @@
+.SidebarChat-message{
+    color:white;
+    font-size: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.SidebarChat-user{
+    width:80%;
+    background-color: white;
+    color:black;
+    border: solid 2px rgb(37, 37, 37);
+    text-align: left;
+    border-radius: 20px;
+    padding:20px;
+}
+
+.SidebarChat-user.other{
+    left : 5%;
+}
+
+.SidebarChat-user.me{
+    right : 5%;
+}
+
+.SidebarChat-user-name{
+    font-size: 15px;
+    margin:0;
+}
+
+.SidebarChat-broadcast{
+    text-align: center;
+}
+
+.SidebarChat-local{
+    text-align: center;
+}
+

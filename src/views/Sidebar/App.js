@@ -12,15 +12,11 @@ class App extends Component {
       position: "fixed",
       top: 0,
       right: 0,
-      bottom: 0,
-      margin: 0,
       height: "100vh",
       width: "400px",
       transition: "all 0.2s ease 0s",
-      zIndex: 999999,
-    },
-
-    src: chrome.runtime.getURL("/sidebar.html"),
+      zIndex: 2147483647,
+    }
   };
 
   state = {
@@ -61,17 +57,7 @@ class App extends Component {
             right: this.state.isVisible ? 0 : '-' + this.props.style.width ,
           }}
         >
-          <Sidebar />
-          <button
-            style={{
-              visibility: this.state.isVisible ? "visible" :  "hidden",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              padding: "20px",
-            }}
-            onClick={this.toggleVisibility}
-          ><i class="fa fa-close"></i></button>
+          <Sidebar onToggle={this.toggleVisibility}/>
         </div>
       </>
     );

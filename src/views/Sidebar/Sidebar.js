@@ -1,97 +1,145 @@
 import { Component } from "react";
 
 // chat app
-import ChatApp from "../../components/Chat/ChatApp";
+import ChatApp from '../../components/Chat/ChatApp';
+import SidebarCollapseBtn from '../../components/Sidebar/SidebarCollapseBtn';
 import User from "./User";
 
+// import custom css for chat
+import './SidebarChat.css';
 
-const SERVER_MESSAGES = {
-  USER_LEFT : (user) => `${user} left the party`,
-  USER_JOINED : (user) => `${user} joined the party`,
-  DISCONNECTED : () => `You disconnected from the server`
+const message_type = {
+  LOCAL : "local",
+  BROADCAST : "broadcast",
+  USER : "user",
 }
 
 class Sidebar extends Component {
-
-  state = {
-    messages: [],
-    view : null,
-  };
+static defaultProps = {
+  onToggle : () => console.log("sidebar toggle clicked")
+}
 
   constructor(props) {
     super(props);
 
-    const user_props = {
-      username: "",
-      onConnect: () => this.setState({view : null}),
-      onDisconnect: () => this.setState({view : null}),
-      onPartyCreated: ({ partyId }) => {chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}})},
-      onPartyJoined: ({ partyId }) => {chrome.runtime.sendMessage(null, {popup : "joined-party", data:{partyId}})},
-      onPartyUserJoining: ({ user, partyId }) =>
-        console.log("user " + user + " joined the party " + partyId),
-      onPartyUserLeft: ({ user, partyId }) =>
-        console.log("user " + user + " left the party " + partyId),
-      onRecieveMessage: ({ msg }) => console.log(msg),
+    this.state = {
+      view: null,
     };
+    this.setupEventListeners();
 
+    const user_props = {
+      onDisconnect: () =>
+        this.chatRef.addMessage({
+          message: "You disconnected from the party.",
+        }),
+      onPartyCreated: ({ partyId }) => {
+        chrome.runtime.sendMessage(null, {
+          popup: "joined-party",
+          data: { partyId },
+        });
+        this.chatRef.addMessage({
+          message: "You have created the party " + partyId,
+          type: message_type.LOCAL,
+        });
+      },
+      onPartyJoined: ({ partyId }) => {
+        chrome.runtime.sendMessage(null, {
+          popup: "joined-party",
+          data: { partyId },
+        });
+        this.chatRef.addMessage({
+          message: "You have joined the party " + partyId,
+          type: message_type.LOCAL,
+        });
+      },
+      onUserJoined: ({ user }) =>
+        this.chatRef.addMessage({
+          user,
+          message: "joined the party",
+          type: message_type.BROADCAST,
+        }),
+      onUserLeft: ({ user }) =>
+        this.chatRef.addMessage({
+          user,
+          message: "left",
+          type: message_type.BROADCAST,
+        }),
+      onUserMessage: ({ user, message }) =>
+        this.chatRef.addMessage({ user, message, type: message_type.USER }),
+    };
     this.user = new User(user_props);
   }
 
-  componentDidMount() {
-    const handlePopupMessages = (message, sender, sendResponse) => {
-      switch (message.content) {
-        case "create-party":
-          // try and create the party room
-          this.user.createParty(message.data.url);
-          break;
+  setupEventListeners = () => {
+    const self = this; // used for scoping issues
 
-        case "join-party":
-          this.user.joinParty(message.data.partyId);
-          break;
-
-        case "already-connected":
-          console.log("checking already connected"+ this.user.partyId);
-          if(this.user.isConnected && this.user.partyId){
-            sendResponse({data : {partyId : this.user.partyId}});
-          }
-          break;
-        default:
-          break;
-      }
-    }
-
+    // register chrome event listener to deal with messages from the popup
     chrome.runtime.onMessage.addListener(function (
       message,
       sender,
       sendResponse
     ) {
       if (message && message.content) {
-        handlePopupMessages(message, sender, sendResponse);
+        switch (message.content) {
+          case "create-party":
+            // try and create the party
+            self.user.createParty(message.data.url);
+            break;
+
+          case "join-party":
+            // try and join the party
+            self.user.joinParty(message.data.partyId);
+            break;
+
+          case "already-connected":
+            // check if already connected to a room
+            if (self.user.partyId) {
+              sendResponse({ data: { partyId: self.user.partyId } });
+            }
+            break;
+          default:
+            break;
+        }
       }
     });
-
-    const createParty = (url) => {
-      this.user.createParty(url);
-    }
-
-    const joinParty = (partyId) => {
-      this.user.joinParty(partyId);
-    }
-
-    
-  }
-
-  onRecieveMessage = (text) => {
-    // recieve a message through the chat (through backend)
-    console.log("message recieved " + text);
   };
+
+
+  renderChatMessage = ({type, message, user=null }) => {
+    switch (type) {
+      case message_type.BROADCAST:
+        return (
+          <div className="SidebarChat-message SidebarChat-broadcast">
+            <p>
+              {user.name ?? "Anonymous"} {message}
+            </p>
+          </div>
+        );
+      case message_type.LOCAL:
+        return (
+          <div className="SidebarChat-message SidebarChat-local">
+            <p>{message}</p>
+          </div>
+        );
+      case message_type.USER:
+        return (
+          <div className={`SidebarChat-message SidebarChat-user ${(this.user.socket.id == user.sid) ? "me" : "other"}`}>
+            <p className="SidebarChat-user-name">{user.name ?? "Anonymous"}</p>
+            <p>{message}</p>
+          </div>
+        );
+      default:
+          break;
+    }
+  }
 
   render() {
     return (
       <div className="Sidebar">
+        <SidebarCollapseBtn onClick={this.props.onToggle}/>
         <ChatApp
-          title={"Chat"}
-          messages={this.state.messages}
+          ref={(ref) => (this.chatRef = ref)}
+          renderChatMessage={this.renderChatMessage}
           onSendMessage={(text) => this.user.messageParty(text)}
         />
         {/* <Avatar /> */}

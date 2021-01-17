@@ -12,7 +12,7 @@ class SidebarWidget extends Component {
     defaultStyle: {
       position: "fixed",
       display : 'block',
-      bottom: "50vh",
+      top: "30vh",
       right: "20vw",
       opacity : 1,
       transition: "all 0.25s ease 0s",
@@ -37,7 +37,7 @@ class SidebarWidget extends Component {
 
   render() {
     return (
-      <div style={{ zIndex: 999999999999999, position: "fixed", width: "100vw", height: "100vh" }}>
+      <div style={{ zIndex: 2147483647, position: "fixed", width: "100vw", height: "100vh" }}>
         <Draggable bounds="parent" onDrag={this.onDrag} onStop={this.onStop}>
           <div
             style={{ ...this.props.defaultStyle, ...this.props.style }}
