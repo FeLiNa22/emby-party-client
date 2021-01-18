@@ -1,4 +1,5 @@
 console.log("Hello Background");
+
 // injection script
 const script = { file: "/static/js/content.js" };
 

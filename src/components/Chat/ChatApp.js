@@ -33,16 +33,18 @@ class SendMessageForm extends Component {
     };
   }
 
-  handleSendButton = (e) => {
+  handleSend = (e) => {
     e.preventDefault();
     this.props.onSendMessage(this.inputRef.value);
+    // clear input
+    this.inputRef.value = "";
   };
 
   handleKeyDown = (e) => {
     switch (e.key) {
       // if enter is pressed send the message
       case "Enter":
-        this.handleSendButton(e);
+        this.handleSend(e);
         break;
       default:
         break;
@@ -67,7 +69,7 @@ class SendMessageForm extends Component {
           }}
           onKeyDown={this.handleKeyDown}
         ></input>
-        <button className="Chat-button" onClick={this.handleSendButton}>
+        <button className="Chat-button" onClick={this.handleSend}>
           <SendIcon style={{ color: "#63ce50" }} />
         </button>
       </div>

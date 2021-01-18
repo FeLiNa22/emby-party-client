@@ -47,7 +47,7 @@ class User {
     this.name = name;
   };
 
-  createParty = (url) => {
+  createParty = (url, next=null) => {
     const onCallback = (resp) => {
       if(resp.data){
         var {partyId, url} = resp.data;
@@ -57,11 +57,12 @@ class User {
       }else if (resp.error){
         this.props.onError(resp.error);
       }
+      if(next) next(resp);
+    };
+    this.socket.emit("party:create", { url }, onCallback);
   };
-  this.socket.emit("party:create", { url }, onCallback);
-};
 
-  joinParty = (partyId) => {
+  joinParty = (partyId, next=null) => {
     const onCallback = (resp) => {
       if(resp.data){
         var {partyId, url} = resp.data;
@@ -71,6 +72,7 @@ class User {
       }else if (resp.error){
         this.props.onError(resp.error);
       }
+      if(next) next(resp);
     };
     this.socket.emit("party:join", { user : this.userDetails(), partyId}, onCallback);
   };

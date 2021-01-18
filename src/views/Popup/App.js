@@ -57,7 +57,7 @@ class App extends Component {
       console.log(message);
       switch (message.popup) {
         case "joined-party":
-          if (!this.hasResponse(message) || this.hasError(message)) {
+          if (this.hasError(message)) {
             this.handleError(message);
           } else {
             if (message.data.partyId) {
@@ -122,16 +122,6 @@ class App extends Component {
   // the link to the party and then opens a new tab
   joinParty = (partyId) => {
     const endpoint = "/party/" + partyId;
-    const handleResponse = (resp) => {
-      if (!this.hasResponse(resp) || this.hasError(resp)) {
-        this.handleError(resp);
-      } else {
-        if (resp.data.status) {
-          this.setHeader( "You have joined the party");
-          this.setView();
-         }
-      }
-    };
 
     // tries to join the party
     fetch(apiServer + endpoint)

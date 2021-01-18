@@ -33,22 +33,14 @@ static defaultProps = {
           message: "You disconnected from the party.",
         }),
       onPartyCreated: ({ partyId }) => {
-        chrome.runtime.sendMessage(null, {
-          popup: "joined-party",
-          data: { partyId },
-        });
         this.chatRef.addMessage({
-          message: "You have created the party " + partyId,
+          message: "You have created a party",
           type: message_type.LOCAL,
         });
       },
       onPartyJoined: ({ partyId }) => {
-        chrome.runtime.sendMessage(null, {
-          popup: "joined-party",
-          data: { partyId },
-        });
         this.chatRef.addMessage({
-          message: "You have joined the party " + partyId,
+          message: "You have joined the party",
           type: message_type.LOCAL,
         });
       },
@@ -72,36 +64,7 @@ static defaultProps = {
 
   setupEventListeners = () => {
     const self = this; // used for scoping issues
-
-    // register chrome event listener to deal with messages from the popup
-    chrome.runtime.onMessage.addListener(function (
-      message,
-      sender,
-      sendResponse
-    ) {
-      if (message && message.content) {
-        switch (message.content) {
-          case "create-party":
-            // try and create the party
-            self.user.createParty(message.data.url);
-            break;
-
-          case "join-party":
-            // try and join the party
-            self.user.joinParty(message.data.partyId);
-            break;
-
-          case "already-connected":
-            // check if already connected to a room
-            if (self.user.partyId) {
-              sendResponse({ data: { partyId: self.user.partyId } });
-            }
-            break;
-          default:
-            break;
-        }
-      }
-    });
+    
   };
 
 

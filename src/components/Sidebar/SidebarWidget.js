@@ -16,6 +16,7 @@ class SidebarWidget extends Component {
       right: "20vw",
       opacity : 1,
       transition: "all 0.25s ease 0s",
+      visibility : "visible"
     },
   };
 
@@ -37,7 +38,7 @@ class SidebarWidget extends Component {
 
   render() {
     return (
-      <div style={{ zIndex: 2147483647, position: "fixed", width: "100vw", height: "100vh" }}>
+      <div style={{ zIndex: 2147483647, visibility:'hidden', position: "fixed", width: "100vw", height: "100vh" }}>
         <Draggable bounds="parent" onDrag={this.onDrag} onStop={this.onStop}>
           <div
             style={{ ...this.props.defaultStyle, ...this.props.style }}

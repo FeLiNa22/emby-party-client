@@ -6,7 +6,6 @@ import "./App.css";
 
 /* Inject Sidebar and Sidebar toggler */
 class App extends Component {
-
   static defaultProps = {
     style: {
       position: "fixed",
@@ -16,7 +15,7 @@ class App extends Component {
       width: "400px",
       transition: "all 0.2s ease 0s",
       zIndex: 2147483647,
-    }
+    },
   };
 
   state = {
@@ -24,9 +23,49 @@ class App extends Component {
   };
 
   componentDidMount() {
+    this.registerChromeEventListeners();
     // onces mounted sets visibilty to true
     this.toggleVisibility();
   }
+
+  registerChromeEventListeners = () => {
+    const self = this; // to deal with scoping issues
+    // register chrome event listener to deal with messages from the popup
+    chrome.runtime.onMessage.addListener(function (
+      message,
+      sender,
+      sendResponse
+    ) {
+      if (message && message.content) {
+        switch (message.content) {
+          case "create-party":
+            // try and create the party
+            self.sidebarRef.user.createParty(message.data.url, (resp) => chrome.runtime.sendMessage(null, {
+              popup: "joined-party",
+              ...resp,
+            }));
+            break;
+
+          case "join-party":
+            // try and join the party
+            self.sidebarRef.user.joinParty(message.data.partyId, (resp) => chrome.runtime.sendMessage(null, {
+              popup: "joined-party",
+              ...resp,
+            }));
+            break;
+
+          case "already-connected":
+            // check if already connected to a room
+            if (self.sidebarRef.user.partyId) {
+              sendResponse({ data: { partyId: self.sidebarRef.user.partyId } });
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    });
+  };
 
   toggleVisibility = () => {
     this.setState((prevState) => {
@@ -48,21 +87,23 @@ class App extends Component {
           onClick={this.toggleVisibility}
           style={{
             visibility: this.state.isVisible ? "hidden" : "visible",
-            opacity : this.state.isVisible ? 0 : 1,
+            opacity: this.state.isVisible ? 0 : 1,
           }}
         />
         <div
           style={{
             ...this.props.style,
-            right: this.state.isVisible ? 0 : '-' + this.props.style.width ,
+            right: this.state.isVisible ? 0 : "-" + this.props.style.width,
           }}
         >
-          <Sidebar onToggle={this.toggleVisibility}/>
+          <Sidebar
+            ref={(ref) => (this.sidebarRef = ref)}
+            onToggle={this.toggleVisibility}
+          />
         </div>
       </>
     );
   }
 }
-
 
 export default App;
