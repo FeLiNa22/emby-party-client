@@ -24,7 +24,8 @@ class User {
       console.log("user " + user + " joined the party " + partyId),
     onUserLeft: ({ user, partyId }) =>
       console.log("user " + user + " left the party " + partyId),
-    onUserMessage: ({ user, message }) => console.log("user " + user + " sent message : " + message),
+    onUserMessage: ({ user, message }) =>
+      console.log("user " + user + " sent message : " + message),
   };
 
   constructor(props) {
@@ -36,50 +37,84 @@ class User {
   }
 
   // packs the non-sensitive user details into an object before sending to server
-  userDetails = () => ({name : this.name, sid : this.socket.id});
+  userDetails = () => ({ name: this.name, sid: this.socket.id });
 
   reset = () => {
     this.partyId = null;
     this.partyUrl = null;
-  }
+  };
 
   setUsername = (name) => {
     this.name = name;
   };
 
-  createParty = (url, next=null) => {
+  createParty = (url, next = null) => {
+    function blobToDataURL(blobUrl, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = "blob";
+
+      xhr.onload = function () {
+        var recoveredBlob = xhr.response;
+
+        var reader = new FileReader();
+
+        reader.onload = function () {
+          callback(reader.result);
+        };
+
+        reader.readAsDataURL(recoveredBlob);
+      };
+
+      xhr.open("GET", blobUrl, true);
+      xhr.send();
+    }
+
+    if (url.includes("blob")) {
+      console.log(url);
+      //**blob to dataURL**
+      blobToDataURL(url, (dataUrl) => this.createParty(dataUrl, next));
+    }
+
     const onCallback = (resp) => {
-      if(resp.data){
-        var {partyId, url} = resp.data;
+      if (resp.data) {
+        var { partyId, url } = resp.data;
         this.partyId = partyId;
         this.partyUrl = url;
         this.props.onPartyCreated(resp.data);
-      }else if (resp.error){
+      } else if (resp.error) {
         this.props.onError(resp.error);
       }
-      if(next) next(resp);
+      if (next) next(resp);
     };
     this.socket.emit("party:create", { url }, onCallback);
   };
 
-  joinParty = (partyId, next=null) => {
+  joinParty = (partyId, next = null) => {
     const onCallback = (resp) => {
-      if(resp.data){
-        var {partyId, url} = resp.data;
+      if (resp.data) {
+        var { partyId, url } = resp.data;
         this.partyId = partyId;
         this.partyUrl = url;
         this.props.onPartyJoined(resp.data);
-      }else if (resp.error){
+      } else if (resp.error) {
         this.props.onError(resp.error);
       }
-      if(next) next(resp);
+      if (next) next(resp);
     };
-    this.socket.emit("party:join", { user : this.userDetails(), partyId}, onCallback);
+    this.socket.emit(
+      "party:join",
+      { user: this.userDetails(), partyId },
+      onCallback
+    );
   };
 
   messageParty = (message) => {
     if (this.partyId && message) {
-      this.socket.emit("party:message", { user : this.userDetails(), partyId: this.partyId, message });
+      this.socket.emit("party:message", {
+        user: this.userDetails(),
+        partyId: this.partyId,
+        message,
+      });
     }
   };
 

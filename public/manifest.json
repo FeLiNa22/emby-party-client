@@ -29,7 +29,7 @@
     "page": "options.html"
   },
 
-  "web_accessible_resources": [ "/static/js/content.js", "/static/css/content.css"],
+  "web_accessible_resources": [ "/static/js/content.js", "/static/css/content.css", "/video.html", "/static/css/video.css", "/static/js/video.js"],
 
-  "permissions": ["storage", "tabs", "activeTab", "*://*/*"]
+  "permissions": ["tabs", "activeTab", "*://*/*"]
 }

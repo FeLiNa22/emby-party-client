@@ -1,0 +1,16 @@
+.htmlvideoplayer{
+    max-width: 100vw;
+    max-height: 100vh;
+    width : 100%;
+    margin : 0 !important;
+    padding: 0 !important;
+}
+
+.VideoWrapper {
+    width : 100%;
+    height : 100vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: black;
+}

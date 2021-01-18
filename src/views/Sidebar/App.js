@@ -23,6 +23,9 @@ class App extends Component {
   };
 
   componentDidMount() {
+    // inject smooth transition sequence
+    document.body.style.transition = "all 0.2s ease 0s";
+
     this.registerChromeEventListeners();
     // onces mounted sets visibilty to true
     this.toggleVisibility();
@@ -36,16 +39,28 @@ class App extends Component {
       sender,
       sendResponse
     ) {
+      console.log(message);
       if (message && message.content) {
         switch (message.content) {
           case "create-party":
             // try and create the party
-            self.sidebarRef.user.createParty(message.data.url, (resp) =>
+            // get the url of the video tag
+            var list = document.getElementsByTagName("VIDEO");
+            if (list.length > 0) {
+              var vid_elem = list[0];
+              console.log(vid_elem);
+              self.sidebarRef.user.createParty(vid_elem.src, (resp) =>
+                chrome.runtime.sendMessage(null, {
+                  popup: "joined-party",
+                  ...resp,
+                })
+              );
+            } else {
               chrome.runtime.sendMessage(null, {
                 popup: "joined-party",
-                ...resp,
-              })
-            );
+                error: {message : "There is no video to share on this page"},
+              });
+            }
             break;
 
           case "join-party":

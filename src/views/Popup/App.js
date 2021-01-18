@@ -10,7 +10,7 @@ const apiServer = "http://localhost:5000";
 // injection script
 const script = { file: "/static/js/content.js" };
 // injection code (determines if page has shareable video)
-const code = { code: 'document.getElementsByTagName("VIDEO").length == 1;' };
+const code = { code: 'document.getElementsByTagName("VIDEO").length > 0;' };
 
 class App extends Component {
   static defaultProps = {
@@ -82,15 +82,8 @@ class App extends Component {
     // check if the active tab is an emby page with a video on it
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       var activeTab = tabs[0];
-      // check if the page is an emby page itself
-      chrome.tabs.executeScript(activeTab.id, code, function (resp) {
-        if (!self.hasResponse(resp) || !resp[0]) {
-          // cannot create party for this page, so just show join view
-          self.setView(self.joinView);
-        }
-        // check if the page already is connected to an emby party session show code for party
-        chrome.tabs.sendMessage(activeTab.id, { content: "already-connected" });
-      });
+      // check if the page already is connected to an emby party session show code for party
+      chrome.tabs.sendMessage(activeTab.id, { content: "already-connected" });
     });
   }
 
@@ -99,15 +92,24 @@ class App extends Component {
     const self = this;
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
       const activeTab = tabs[0];
-      chrome.tabs.executeScript(activeTab.id, script, function (resp) {
-        if (self.hasResponse(resp)) {
-          chrome.tabs.sendMessage(activeTab.id, {
-            content: "create-party",
-            data: { url: activeTab.url },
-          });
-        } else {
-          self.setHeader("You cannot create a party for this page");
+      // check if the page is an emby page itself
+      chrome.tabs.executeScript(activeTab.id, code, function (resp) {
+        if (!self.hasResponse(resp) || !resp[0]) {
+          // cannot create party for this page
+          self.setHeader("This page as no video to share :(");
           self.setView();
+        } else {
+          // page is injectable so inject content script
+          chrome.tabs.executeScript(activeTab.id, script, function (resp) {
+            if (self.hasResponse(resp)) {
+              chrome.tabs.sendMessage(activeTab.id, {
+                content: "create-party",
+              });
+            } else {
+              self.setHeader("You cannot create a party for this page");
+              self.setView();
+            }
+          });
         }
       });
     });
