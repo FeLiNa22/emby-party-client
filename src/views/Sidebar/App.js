@@ -40,24 +40,31 @@ class App extends Component {
         switch (message.content) {
           case "create-party":
             // try and create the party
-            self.sidebarRef.user.createParty(message.data.url, (resp) => chrome.runtime.sendMessage(null, {
-              popup: "joined-party",
-              ...resp,
-            }));
+            self.sidebarRef.user.createParty(message.data.url, (resp) =>
+              chrome.runtime.sendMessage(null, {
+                popup: "joined-party",
+                ...resp,
+              })
+            );
             break;
 
           case "join-party":
             // try and join the party
-            self.sidebarRef.user.joinParty(message.data.partyId, (resp) => chrome.runtime.sendMessage(null, {
-              popup: "joined-party",
-              ...resp,
-            }));
+            self.sidebarRef.user.joinParty(message.data.partyId, (resp) =>
+              chrome.runtime.sendMessage(null, {
+                popup: "joined-party",
+                ...resp,
+              })
+            );
             break;
 
           case "already-connected":
             // check if already connected to a room
             if (self.sidebarRef.user.partyId) {
-              sendResponse({ data: { partyId: self.sidebarRef.user.partyId } });
+              chrome.runtime.sendMessage(null, {
+                popup: "joined-party",
+                data: { partyId: self.sidebarRef.user.partyId },
+              });
             }
             break;
           default:
