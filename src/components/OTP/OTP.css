@@ -6,8 +6,8 @@
     margin: 1vmin;
     border : solid 2px rgb(77, 71, 71);
     border-radius: 5px;
-    width: 11vw;
-    height: 11vw;
+    width: calc((90vw - 14vmin) / 7);
+    height: calc((90vw - 14vmin) / 7);
     font-size : calc(6vmin + .2em);
     text-align : center;
     font-weight : 800;

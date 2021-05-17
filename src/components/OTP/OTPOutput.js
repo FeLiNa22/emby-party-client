@@ -34,7 +34,7 @@ class OTPOutput extends Component {
   render() {
     return (
       <>
-      <div className="Otp-container">
+      <div style={{...this.props.style}} className="Otp-container">
         {this.OTPvalues.map((val, idx) => {
           return (
             <input

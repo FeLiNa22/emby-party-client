@@ -1,34 +1,26 @@
-console.log("Hello Background");
+import { BackgroundController } from "./controllers/BackgroundController";
+import { UserDataController } from "./controllers/UserDataController";
 
-// injection script
-const script = { file: "/static/js/content.js" };
+// controller holds handler functions
+const backgroundController = new BackgroundController();
+const userDataController = new UserDataController();
 
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log(message);
-  switch (message.background) {
-    case "join-party":
-      chrome.tabs.update(
-        { url: chrome.runtime.getURL("video.html") },
-        function (tab) {
-          chrome.tabs.onUpdated.addListener(function listener(
-            tabId,
-            changeInfo
-          ) {
-            if (tabId === tab.id && changeInfo.status == "complete") {
-              chrome.tabs.onUpdated.removeListener(listener);
-              // Now the tab is ready!
-              
-              // send the partyId to the sidebar
-              chrome.tabs.sendMessage(tab.id, {
-                content: "join-party",
-                data: message.data,
-              });
-            }
-          });
-        }
-      );
-      break;
-    default:
-      break;
+// listen for join event
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // only accept messages sent from popup
+  if (sender.tab === undefined) {
+    if (message.state === "popup:join") {
+      // on joining a party create a new tab and join the party there
+      backgroundController.handleJoiningParty(message, sender, sendResponse);
+    } else if (message.state === "popup:create") {
+      // on creating a party check if there is a video to share on
+      // the page and then inject sidebar and controller code into the page
+      backgroundController.handleCreatingParty(message, sender, sendResponse);
+    } else if (message.state === "popup:get") {
+      // on getting party, check if the page has injected code,
+      // and check if there is a connection there
+      backgroundController.handleGettingParty(message, sender, sendResponse);
+    }
   }
+  return true;
 });
