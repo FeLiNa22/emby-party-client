@@ -1,8 +1,25 @@
-.Sidebar{
-    height: 100%;
-    width: 100%;
-    background-color: rgb(19, 19, 19);
-    overflow: hidden;
-    box-shadow: -10px 0px 18px #888888;
+.Sidebar-leave-party-button {
+  font-size: 20px;
+  color: white;
+  padding: 5px 20px;
+  border: 2px solid whitesmoke;
+  background: transparent;
+  outline: none;
+  float: right;
+  border-radius: 25px;
+  margin: 10px 10px;
 }
 
+.Sidebar-leave-party-button:hover {
+  background-color: #444;
+}
+
+.Sidebar-party-name{
+    display: inline-block;
+    font-size: 22px;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(218, 218, 218);
+    padding: 15px 20px;
+    vertical-align: auto;
+}

@@ -9,8 +9,8 @@ export class EmbyIcon extends Component {
           xmlnsXlink="http://www.w3.org/1999/xlink"
           version="1.1"
           id="mdi-emby"
-          width="50"
-          height="50"
+          width="70"
+          height="70"
           viewBox="0 0 24 24"
         >
             <circle r="12" cx="50%" cy="50%" fill="#2d2926"/>

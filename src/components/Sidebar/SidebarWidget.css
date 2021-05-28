@@ -1,0 +1,41 @@
+.Sidebar-widget-container {
+  z-index: 2147483647;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.Sidebar-widget {
+  position: fixed;
+  display: block;
+  top: 30vh;
+  right: 20vw;
+}
+
+.Sidebar-widget:hover {
+  filter: brightness(1.2);
+  transition: all 0.5s;
+}
+
+.Sidebar-widget.shown {
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity none;
+}
+
+.Sidebar-widget.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity none;
+}
+
+.Sidebar-widget.hiding {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s;
+}

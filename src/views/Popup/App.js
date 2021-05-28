@@ -45,7 +45,7 @@ class App extends Component {
   }
 
   onCreatedParty = (party) => {
-    if (party["error"] === undefined) {
+    if (!party.error) {
       // if party created succesfully
       this.setState({ view: <Connected party={party} /> });
     } else {
@@ -62,7 +62,7 @@ class App extends Component {
   };
 
   onJoinedParty = (party) => {
-    if (party["error"] === undefined) {
+    if (!party.error) {
       // if party joined/created succesfully
       this.setState({ view: <Connected party={party} /> });
     } else {
@@ -89,8 +89,8 @@ class App extends Component {
 
   componentDidMount = () => {
     // check if tab has already established a connection
-    this.controller.getConnection((party) => {
-      if (party["error"] === undefined) {
+    this.controller.getParty((party) => {
+      if (!party.error) {
         this.setState({ view: <Connected party={party} /> });
       }
     });

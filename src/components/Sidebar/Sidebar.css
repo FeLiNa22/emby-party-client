@@ -1,0 +1,39 @@
+.Sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background-color: rgb(19, 19, 19);
+  overflow: hidden;
+  box-shadow: -10px 0px 18px #4d4d4d;
+  background-color: black;
+  z-index: 2147483647;
+  transition: all 0.2s ease 0s;
+  display: flex;
+  flex-direction: column;
+}
+
+.Sidebar.collapsed {
+  box-shadow: none;
+  right: -400px;
+}
+
+body.collapsed{
+  right : 400px;
+}
+
+.Sidebar-header {
+  width: 100%;
+  height: 100px;
+}
+
+.Sidebar-body {
+  width: 100%;
+  height: 100%;
+}
+
+.Sidebar-footer {
+  width: 100%;
+  height: 100px;
+}

@@ -1,7 +1,10 @@
 .SidebarChat-message{
     color:white;
-    font-size: 20px;
+    font-size: 18px;
     margin : 2%;
+    width:100%;
+    clear: both;
+    display: inline-block;
 }
 
 .SidebarChat-message p{
@@ -25,13 +28,13 @@
 .SidebarChat-user.me{
     float : right;
     text-align: right;
-    background-color: rgb(116, 221, 102);
+    background-color: #63ce50;
     color : black;
 }
 
 .SidebarChat-user-name{
-    font-size: 15px;
-    margin:0;
+    font-size: 18px;
+    font-weight: 700;
 }
 
 .SidebarChat-broadcast{

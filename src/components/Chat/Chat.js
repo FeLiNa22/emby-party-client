@@ -1,5 +1,5 @@
 import { Component } from "react";
-import "./ChatApp.css";
+import "./Chat.css";
 
 import EmojiPicker from "./EmojiPicker";
 import { SendIcon } from "./Icons";
@@ -20,7 +20,7 @@ class Title extends Component {
 
 class SendMessageForm extends Component {
   static defaultProps = {
-    placeholder: "send message...",
+    placeholder: "Send a message...",
     onSendMessage: (text) => {
       console.log(text);
     },
@@ -35,9 +35,12 @@ class SendMessageForm extends Component {
 
   handleSend = (e) => {
     e.preventDefault();
-    this.props.onSendMessage(this.inputRef.value);
-    // clear input
-    this.inputRef.value = "";
+    // only trigger send if input is not all whitespace
+    if (this.inputRef.value.replace(/\s/g, "").length) {
+      this.props.onSendMessage(this.inputRef.value);
+      // clear input
+      this.inputRef.value = "";
+    }
   };
 
   handleKeyDown = (e) => {
@@ -79,31 +82,48 @@ class SendMessageForm extends Component {
 
 class Messages extends Component {
   static defaultProps = {
-    messages: [],
-    renderChatMessage: (text) => {
-      return (
-        <div className="Chat-message">
-          <p>{text}</p>
-        </div>
-      );
-    },
+    messages: [], // array type => [{id, html}]
   };
 
   constructor(props) {
     super(props);
+    // I have allowed passing existiong message through props
+    // to support stateful messaging
     this.state = { messages: this.props.messages };
   }
 
-  addMessage = (msg) => {
+  componentDidMount = () => {
+    this.scrollToBottom();
+  };
+
+  componentDidUpdate = () => {
+    this.scrollToBottom();
+  };
+
+  scrollToBottom = () => {
+    this.messagesEndRef.scrollIntoView({ behavior: "smooth" });
+  };
+
+  addMessage = (id, html) => {
     this.setState((prevState) => ({
-      messages: prevState.messages.concat(msg),
+      messages: prevState.messages.concat({ id, html }),
+    }));
+  };
+
+  removeMessage = (id) => {
+    this.setState((prevState) => ({
+      messages: prevState.messages.filter((msg) => msg.id !== id),
     }));
   };
 
   render() {
     return (
       <div className="Chat-container">
-        {this.state.messages.map((msg) => this.props.renderChatMessage(msg))}
+        {this.state.messages.map((msg) => msg.html)}
+        <div
+          style={{ float: "left", clear: "both" }}
+          ref={(ref) => (this.messagesEndRef = ref)}
+        />
       </div>
     );
   }
@@ -111,24 +131,29 @@ class Messages extends Component {
 
 /* The chat app requires only the onSendMessage function */
 
-class ChatApp extends Component {
-  // relay msg to Messages component
-  addMessage = (msg) => {
-    this.messageRef.addMessage(msg);
+class Chat extends Component {
+  constructor(props) {
+    super(props);
+    const { title, onSendMessage } = props;
+  }
+
+  addMessage = (id, message) => {
+    this.messagesRef.addMessage(id, message);
+  };
+
+  removeMessage = (id) => {
+    this.messagesRef.removeMessage(id);
   };
 
   render() {
     return (
       <div className="Chat-app">
         <Title title={this.props.title} />
-        <Messages
-          ref={(ref) => (this.messageRef = ref)}
-          renderChatMessage={this.props.renderChatMessage}
-        />
+        <Messages ref={(ref) => (this.messagesRef = ref)} />
         <SendMessageForm onSendMessage={this.props.onSendMessage} />
       </div>
     );
   }
 }
 
-export default ChatApp;
+export default Chat;

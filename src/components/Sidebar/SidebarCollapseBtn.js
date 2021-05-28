@@ -1,4 +1,5 @@
 import { Component } from "react";
+import './SidebarCollapseButton.css';
 
 class SidebarCollapseBtn extends Component {
   static defaultProps = {
@@ -8,14 +9,10 @@ class SidebarCollapseBtn extends Component {
   render() {
     return (
       <button
-        style={{
-          top: 0,
-          left: 0,
-          padding: "20px",
-        }}
+        className="Sidebar-collapse-button"
         onClick={this.props.onClick}
       >
-        <i class="fa fa-close"></i>
+        &times;
       </button>
     );
   }

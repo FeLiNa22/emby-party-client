@@ -4,24 +4,18 @@ import Draggable from "react-draggable";
 
 import { EmbyIcon } from "./Icons";
 
-class SidebarWidget extends Component {
-  static defaultProps = {
-    onClick: () => {
-      console.log("widget clicked");
-    },
-    defaultStyle: {
-      position: "fixed",
-      display : 'block',
-      top: "30vh",
-      right: "20vw",
-      opacity : 1,
-      transition: "all 0.25s ease 0s",
-      visibility : "visible"
-    },
-  };
+import "./SidebarWidget.css";
 
+const state = {
+  SHOWN: "shown",
+  HIDDEN: "hidden",
+  HIDING: "hiding",
+};
+
+class SidebarWidget extends Component {
   state = {
     dragging: false,
+    hiddenState: state.HIDDEN,
   };
 
   onDrag = () => {
@@ -36,13 +30,23 @@ class SidebarWidget extends Component {
     }
   };
 
+  hideSlowly = () => {
+    this.setState({ hiddenState: state.HIDING });
+  };
+
+  showImmediately = () => {
+    this.setState({ hiddenState: state.SHOWN });
+  };
+
+  hideImmediately = () => {
+    this.setState({ hiddenState: state.HIDDEN });
+  };
+
   render() {
     return (
-      <div style={{ zIndex: 2147483647, visibility:'hidden', position: "fixed", width: "100vw", height: "100vh", top : 0, right :0, left:0, bottom:0 }}>
+      <div className="Sidebar-widget-container">
         <Draggable bounds="parent" onDrag={this.onDrag} onStop={this.onStop}>
-          <div
-            style={{ ...this.props.defaultStyle, ...this.props.style }}
-          >
+          <div className={"Sidebar-widget " + this.state.hiddenState}>
             <EmbyIcon />
           </div>
         </Draggable>

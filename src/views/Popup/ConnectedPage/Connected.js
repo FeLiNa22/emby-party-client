@@ -12,7 +12,6 @@ export class Connected extends Component {
   constructor(props) {
     super(props);
     const { party } = props;
-    console.log(party);
     const { id, video, members } = party;
     this.partyId = id;
     this.video = video ? video.name : "Nothing";

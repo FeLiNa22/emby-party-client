@@ -1,0 +1,12 @@
+.Donate-container{
+    width: 90%;
+    display: block;
+    margin: 10px auto;
+}
+
+.Donate-text{
+    color: rgb(194, 255, 255);
+    font-size: 16px;
+    font-family: monospace;
+    margin: 0;
+}
